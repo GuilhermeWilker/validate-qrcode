@@ -16,6 +16,16 @@ use App\Models\QrcodeInvite as ModelsQrcodeInvite;
 
 class EmailController extends Controller
 {
+    public function index()
+    {
+
+        $guardians = count(User::all());
+
+        return view('index', [
+            'guardians' => $guardians
+        ]);
+    }
+
     public function sendEmails()
     {
         try {
@@ -27,6 +37,7 @@ class EmailController extends Controller
                     SendQrcodeEmail::dispatch($guardian);
                 }
             }
+
             return redirect()->back()
                 ->with('success', 'Convites enviados!');
         } catch (\Exception $e) {

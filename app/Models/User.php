@@ -51,4 +51,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(QrcodeInvite::class);
     }
+
+    public function isAdmin()
+    {
+        $this->NOME === 'Admin'
+            ? true
+            : false;
+    }
 }

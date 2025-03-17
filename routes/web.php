@@ -1,25 +1,38 @@
 <?php
 
-use App\Http\Controllers\EmailController;
-use App\Models\User;
+use App\Http\Controllers\CsvController;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EmailController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\QrcodeValidatorController;
 
-Route::get('/', function () {
-    $guardians = count(User::all());
+Route::get('/', [QrcodeValidatorController::class, 'index'])
+    ->name('validate-qrcode');
+Route::post('/validate-qrcode', [QrcodeValidatorController::class, 'validateQrcode'])
+    ->name('validate-qrcode');
 
-    return view('index', [
-        'guardians' => $guardians
-    ]);
-})->name('home');
 
-Route::get('/validate-qrcode', function () {
-    $guardians = count(User::all());
+Route::get('/send-qrcode', [EmailController::class, 'index'])
+    ->name('home');
+Route::post("/send-emails", [EmailController::class, 'sendEmails'])
+    ->name("send-email");
 
-    return view('validate-qrcode', [
-        'guardians' => $guardians
-    ]);
-})->name('validate-qrcode');
+Route::get('/add-csv', [CsvController::class, 'index'])->name('add-csv');
+Route::post("/add-csvfile", [CsvController::class, 'generateDataFromCsv'])->name("add-csvfile");
 
-Route::get("/test", fn() => redirect()->back()->with('success', 'Convites enviados!'));
 
-Route::post("/send-emails", [EmailController::class, 'sendEmails'])->name("send-email");
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::redirect('/dashboard', '/validate-qrcode');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__ . '/auth.php';

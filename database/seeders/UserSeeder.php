@@ -14,17 +14,12 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $csvFile = base_path('database/data/data.csv');
+        //..
+    }
 
-        if (!file_exists($csvFile)) {
-            $this->command->error('Arquivo CSV não encontrado em: ' . $csvFile);
-            return;
-        }
-
-        $csv = Reader::createFromPath($csvFile, 'r');
-        $csv->setHeaderOffset(0);
-
-        $records = $csv->getRecords();
+    public function importCsvData($records)
+    {
+        User::truncate();
 
         foreach ($records as $record) {
             User::updateOrInsert(
@@ -40,7 +35,5 @@ class UserSeeder extends Seeder
                 ]
             );
         }
-
-        $this->command->info('Dados importados com sucesso do seu arquivo .csv!!');
     }
 }
